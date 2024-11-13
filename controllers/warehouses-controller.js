@@ -68,7 +68,7 @@ const addWarehouse = async (req, res) => {
       message: "Please provide a valid email address in the request",
     });
   }
-  if (!phone(req.body.phone).isValid) {
+  if (!phone(req.body.contact_phone).isValid) {
     return res.status(400).json({
       message: "Please provide a valid phone number in the request",
     });
@@ -82,7 +82,7 @@ const addWarehouse = async (req, res) => {
       id: newWarehouseId,
     });
 
-    res.status(201).json(createdWarehouse);
+    res.status(201).json(createdWarehouse[0]);
   } catch (error) {
     res.status(500).json({
       message: `Unable to create new warehouse: ${error}`,
