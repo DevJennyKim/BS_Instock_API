@@ -23,6 +23,9 @@ const getInventoriesList = async (_req, res) => {
 
 const updateInventories = async (req, res) => {
   try {
+    const { id, ...updateData } = req.body;
+    const { warehouse_id, item_name, description, category, status, quantity } =
+      updateData;
     if (
       !warehouse_id ||
       !item_name ||
@@ -42,9 +45,12 @@ const updateInventories = async (req, res) => {
     if (isNaN(quantity)) {
       return res.status(400).json({ message: 'Quantity must be a number' });
     }
+    updateData.updated_at = new Date();
+
     const rowsUpdated = await knex('inventories')
       .where({ id: req.params.id })
-      .update(req.body);
+      .update(updateData);
+
     if (rowsUpdated === 0) {
       return res.status(404).json({
         message: `Inventory item with ID ${req.params.id} not found`,
