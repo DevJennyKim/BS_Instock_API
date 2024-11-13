@@ -33,19 +33,26 @@ const getWarehouseById = async (req, res) => {
 
 const updateWarehouse = async (req, res) => {
   try {
-    const warehouse = await knex("warehouses")
+    const { id, ...updateData } = req.body;
+    console.log(updateData);
+
+    const rowsUpdated = await knex("warehouses")
       .where({ id: req.params.id })
-      .first();
-    if (!warehouse) {
-      return res
-        .status(404)
-        .json({ message: `Warehouse with ID ${req.params.id} not found` });
+      .update(updateData);
+
+    if (rowsUpdated === 0) {
+      return res.status(404).json({
+        message: `Warehouse with ID ${req.params.id} not found`,
+      });
     }
-    res.status(200).json(warehouse);
+    const updatedWarehouse = await knex("warehouses").where({
+      id: req.params.id,
+    });
+    res.json(updatedWarehouse[0]);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: `Unable to retrieve warehouse data: ${error.message}` });
+    res.status(500).json({
+      message: `Unable to update warehouse with ID ${req.params.id}: ${error}`,
+    });
   }
 };
 
