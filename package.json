@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node --watch index.js",
     "db:migrate": "knex migrate:latest",
     "db:seed": "knex seed:run"
   },
