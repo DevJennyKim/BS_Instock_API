@@ -1,7 +1,7 @@
 import initKnex from "knex";
 import configuration from "../knexfile.js";
-import isEmail from "isemail";
-import { phone } from "phone";
+import { validateRequest } from "../utils/validateRequest.js";
+
 const knex = initKnex(configuration);
 
 const getWarehousesList = async (_req, res) => {
@@ -32,6 +32,7 @@ const getWarehouseById = async (req, res) => {
 };
 
 const updateWarehouse = async (req, res) => {
+  validateRequest(req.body);
   try {
     const { id, ...updateData } = req.body;
 
@@ -56,24 +57,7 @@ const updateWarehouse = async (req, res) => {
 };
 
 const addWarehouse = async (req, res) => {
-  for (const [key, value] of Object.entries(req.body)) {
-    if (!value) {
-      return res.status(400).json({
-        message: "Please provide all required form fields in the request",
-      });
-    }
-  }
-  if (!isEmail.validate(req.body.contact_email, { tld: true })) {
-    return res.status(400).json({
-      message: "Please provide a valid email address in the request",
-    });
-  }
-  if (!phone(req.body.contact_phone).isValid) {
-    return res.status(400).json({
-      message: "Please provide a valid phone number in the request",
-    });
-  }
-
+  validateRequest(req.body);
   try {
     const result = await knex("warehouses").insert(req.body);
 
