@@ -34,7 +34,6 @@ const getWarehouseById = async (req, res) => {
 const updateWarehouse = async (req, res) => {
   try {
     const { id, ...updateData } = req.body;
-    console.log(updateData);
 
     const rowsUpdated = await knex("warehouses")
       .where({ id: req.params.id })
