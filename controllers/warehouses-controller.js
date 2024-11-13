@@ -74,4 +74,26 @@ const addWarehouse = async (req, res) => {
   }
 };
 
-export { getWarehousesList, getWarehouseById, updateWarehouse, addWarehouse };
+
+const getInventoriesByWarehouseId = async (req, res) => {
+  const warehouseId = req.params.id;
+
+  try{
+    const warehouse = await knex("warehouses").where({id: warehouseId}).first();
+
+    if(!warehouse){
+      return res.status(404).json({message: `Warehouse with ID ${warehouseId} not found`});
+    }
+    const inventories = await knex("inventories")
+      .select("id", "item_name", "category", "status", "quantity")
+      .where({warehouse_id: warehouseId});
+
+    res.status(200).json(inventories);
+  } catch (error){
+    console.log("Error fetching inventories:", error);
+    res.status(500).json({message: `An error occurred: ${error.message}`});
+  }
+
+};
+
+export { getWarehousesList, getWarehouseById, updateWarehouse, addWarehouse, getInventoriesByWarehouseId };
