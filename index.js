@@ -5,13 +5,14 @@ const app = express();
 
 const PORT = process.env.PORT || 5050;
 
-// import invRoutes from "./routes/inventories-routes.js";
+import inventoriesRoutes from "./routes/inventories-routes.js";
 import warehousesRoutes from "./routes/warehouses-routes.js";
 
 app.use(express.json());
 app.use(cors());
 
 app.use("/api/warehouses", warehousesRoutes);
+app.use("/api/inventories", inventoriesRoutes);
 
 app.listen(PORT, () => {
   console.log(`running at http://localhost:${PORT}`);
