@@ -10,9 +10,10 @@ const getWarehousesList = async (_req, res) => {
     res.status(400).json({ message: `Error retrieving warehouses: ${error}` });
   }
 };
-
 const updateWarehouse = async (req, res) => {
   try {
+    const { id, ...updateData } = req.body;
+
     const rowsUpdated = await knex('warehouses')
       .where({ id: req.params.id })
       .update(req.body);
