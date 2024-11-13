@@ -6,4 +6,8 @@ router.route('/').get(warehousesController.getWarehousesList);
 
 router.route('/:id').put(warehousesController.updateWarehouse);
 
+router.
+    route('/:id')
+    .get(warehousesController.getWarehouseById);
+
 export default router;
