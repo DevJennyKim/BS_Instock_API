@@ -22,7 +22,7 @@ const getInventoriesList = async (_req, res) => {
   }
 };
 
-const addInventories = async (req, res) => {
+const addInventoryItem = async (req, res) => {
   const { result, message } = validateRequest(req.body);
 
   if (!result) {
@@ -39,13 +39,13 @@ const addInventories = async (req, res) => {
 
     const dbResult = await knex('inventories').insert(req.body);
 
-    const newInventoriesId = dbResult[0];
+    const newInventoryItemId = dbResult[0];
 
-    const createdInventories = await knex('inventories')
-      .where({ id: newInventoriesId })
+    const createdInventoryItem = await knex('inventories')
+      .where({ id: newInventoryItemId })
       .first();
 
-    res.status(201).json(createdInventories);
+    res.status(201).json(createdInventoryItem);
   } catch (error) {
     res
       .status(500)
@@ -96,4 +96,4 @@ const updateInventories = async (req, res) => {
   }
 };
 
-export { getInventoriesList, updateInventories, addInventories };
+export { getInventoriesList, updateInventories, addInventoryItem };
