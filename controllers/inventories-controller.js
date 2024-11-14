@@ -1,19 +1,20 @@
-import initKnex from 'knex';
-import configuration from '../knexfile.js';
+import initKnex from "knex";
+import configuration from "../knexfile.js";
+import { validateRequest } from "../utils/validateRequest.js";
 const knex = initKnex(configuration);
 
 const getInventoriesList = async (_req, res) => {
   try {
-    const data = await knex('inventories')
-      .join('warehouses', 'warehouses.id', 'inventories.warehouse_id')
+    const data = await knex("inventories")
+      .join("warehouses", "warehouses.id", "inventories.warehouse_id")
       .select(
-        'inventories.id',
-        'warehouses.warehouse_name',
-        'inventories.item_name',
-        'inventories.description',
-        'inventories.category',
-        'inventories.status',
-        'inventories.quantity'
+        "inventories.id",
+        "warehouses.warehouse_name",
+        "inventories.item_name",
+        "inventories.description",
+        "inventories.category",
+        "inventories.status",
+        "inventories.quantity"
       );
     res.status(200).json(data);
   } catch (error) {
@@ -22,32 +23,27 @@ const getInventoriesList = async (_req, res) => {
 };
 
 const updateInventories = async (req, res) => {
+  const { result, message } = validateRequest(req.body);
+
+  if (!result) {
+    return res.status(400).json({ message: message });
+  }
+
   try {
     const { id, ...updateData } = req.body;
-    const { warehouse_id, item_name, description, category, status, quantity } =
-      updateData;
-    if (
-      !warehouse_id ||
-      !item_name ||
-      !description ||
-      !category ||
-      !status ||
-      quantity === undefined
-    ) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-    const warehouseExists = await knex('warehouses')
-      .where({ id: warehouse_id })
+
+    const warehouseExists = await knex("warehouses")
+      .where({ id: updateData.warehouse_id })
       .first();
     if (!warehouseExists) {
-      return res.status(400).json({ message: 'Warehouse ID does not exist' });
+      return res.status(400).json({ message: "Warehouse ID does not exist" });
     }
-    if (isNaN(quantity)) {
-      return res.status(400).json({ message: 'Quantity must be a number' });
+    if (isNaN(updateData.quantity)) {
+      return res.status(400).json({ message: "Quantity must be a number" });
     }
     updateData.updated_at = new Date();
 
-    const rowsUpdated = await knex('inventories')
+    const rowsUpdated = await knex("inventories")
       .where({ id: req.params.id })
       .update(updateData);
 
@@ -56,7 +52,7 @@ const updateInventories = async (req, res) => {
         message: `Inventory item with ID ${req.params.id} not found`,
       });
     }
-    const updatedInventory = await knex('inventories').where({
+    const updatedInventory = await knex("inventories").where({
       id: req.params.id,
     });
     res.json(updatedInventory[0]);
