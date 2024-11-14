@@ -12,4 +12,6 @@ router
   .get(warehousesController.getWarehouseById)
   .put(warehousesController.updateWarehouse);
 
+router
+  .route("/:id/inventories").get(warehousesController.getInventoriesByWarehouseId);
 export default router;
