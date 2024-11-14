@@ -53,7 +53,7 @@ const addInventoryItem = async (req, res) => {
   }
 };
 
-const updateInventories = async (req, res) => {
+const updateInventoryItem = async (req, res) => {
   const { result, message } = validateRequest(req.body);
 
   if (!result) {
@@ -117,9 +117,41 @@ const deleteInventory = async (req, res) => {
   }
 };
 
+const getInventoryItemById = async (req, res) => {
+  const inventoryId = req.params.id;
+
+  try {
+    const inventoryItem = await knex("inventories")
+      .select(
+        "inventories.id",
+        "warehouses.warehouse_name",
+        "inventories.item_name",
+        "inventories.description",
+        "inventories.category",
+        "inventories.status",
+        "inventories.quantity"
+      )
+      .join("warehouses", "inventories.warehouse_id", "warehouses.id")
+      .where("inventories.id", inventoryId)
+      .first();
+
+    if (!inventoryItem) {
+      return res
+        .status(404)
+        .json({ message: `Inventory item with ID ${inventoryId} not found` });
+    }
+
+    res.status(200).json(inventoryItem);
+  } catch (error) {
+    console.error("Error retrieving inventory item:", error);
+    res.status(500).json({ message: `An error occurred: ${error.message}` });
+  }
+};
+
 export {
   getInventoriesList,
   addInventoryItem,
-  updateInventories,
+  updateInventoryItem,
   deleteInventory,
+  getInventoryItemById,
 };
