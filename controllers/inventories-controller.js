@@ -23,23 +23,23 @@ const getInventoriesList = async (_req, res) => {
 };
 
 const addInventories = async (req, res) => {
-  try {
-    const { warehouse_id, quantity } = req.body;
+  const { result, message } = validateRequest(req.body);
 
+  if (!result) {
+    return res.status(400).json({ message: message });
+  }
+
+  try {
     const warehouseExists = await knex('warehouses')
-      .where({ id: warehouse_id })
+      .where({ id: req.body.warehouse_id })
       .first();
     if (!warehouseExists) {
       return res.status(400).json({ message: 'Warehouse ID does not exist' });
     }
 
-    if (isNaN(quantity)) {
-      return res.status(400).json({ message: 'Quantity must be a number' });
-    }
+    const dbResult = await knex('inventories').insert(req.body);
 
-    const result = await knex('inventories').insert(req.body);
-
-    const newInventoriesId = result[0];
+    const newInventoriesId = dbResult[0];
 
     const createdInventories = await knex('inventories')
       .where({ id: newInventoriesId })
