@@ -7,6 +7,8 @@ router
   .get(inventoriesController.getInventoriesList)
   .post(inventoriesController.addInventoryItem);
 
-router.route('/:id').put(inventoriesController.updateInventories);
+router.route('/:id')
+    .put(inventoriesController.updateInventories)
+    .delete(inventoriesController.deleteInventory);
 
 export default router;
