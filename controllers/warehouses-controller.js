@@ -32,7 +32,12 @@ const getWarehouseById = async (req, res) => {
 };
 
 const updateWarehouse = async (req, res) => {
-  validateRequest(req.body);
+  const { result, message } = validateRequest(req.body);
+
+  if (!result) {
+    return res.status(400).json({ message: message });
+  }
+
   try {
     const { id, ...updateData } = req.body;
 
@@ -57,7 +62,12 @@ const updateWarehouse = async (req, res) => {
 };
 
 const addWarehouse = async (req, res) => {
-  validateRequest(req.body);
+  const { result, message } = validateRequest(req.body);
+
+  if (!result) {
+    return res.status(400).json({ message: message });
+  }
+
   try {
     const result = await knex("warehouses").insert(req.body);
 
@@ -74,26 +84,34 @@ const addWarehouse = async (req, res) => {
   }
 };
 
-
 const getInventoriesByWarehouseId = async (req, res) => {
   const warehouseId = req.params.id;
 
-  try{
-    const warehouse = await knex("warehouses").where({id: warehouseId}).first();
+  try {
+    const warehouse = await knex("warehouses")
+      .where({ id: warehouseId })
+      .first();
 
-    if(!warehouse){
-      return res.status(404).json({message: `Warehouse with ID ${warehouseId} not found`});
+    if (!warehouse) {
+      return res
+        .status(404)
+        .json({ message: `Warehouse with ID ${warehouseId} not found` });
     }
     const inventories = await knex("inventories")
       .select("id", "item_name", "category", "status", "quantity")
-      .where({warehouse_id: warehouseId});
+      .where({ warehouse_id: warehouseId });
 
     res.status(200).json(inventories);
-  } catch (error){
+  } catch (error) {
     console.log("Error fetching inventories:", error);
-    res.status(500).json({message: `An error occurred: ${error.message}`});
+    res.status(500).json({ message: `An error occurred: ${error.message}` });
   }
-
 };
 
-export { getWarehousesList, getWarehouseById, updateWarehouse, addWarehouse, getInventoriesByWarehouseId };
+export {
+  getWarehousesList,
+  getWarehouseById,
+  updateWarehouse,
+  addWarehouse,
+  getInventoriesByWarehouseId,
+};
