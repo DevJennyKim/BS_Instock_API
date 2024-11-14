@@ -1,7 +1,7 @@
 import initKnex from "knex";
 import configuration from "../knexfile.js";
-import isEmail from "isemail";
-import { phone } from "phone";
+import { validateRequest } from "../utils/validateRequest.js";
+
 const knex = initKnex(configuration);
 
 const getWarehousesList = async (_req, res) => {
@@ -32,6 +32,12 @@ const getWarehouseById = async (req, res) => {
 };
 
 const updateWarehouse = async (req, res) => {
+  const { result, message } = validateRequest(req.body);
+
+  if (!result) {
+    return res.status(400).json({ message: message });
+  }
+
   try {
     const { id, ...updateData } = req.body;
 
@@ -56,22 +62,10 @@ const updateWarehouse = async (req, res) => {
 };
 
 const addWarehouse = async (req, res) => {
-  for (const [key, value] of Object.entries(req.body)) {
-    if (!value) {
-      return res.status(400).json({
-        message: "Please provide all required form fields in the request",
-      });
-    }
-  }
-  if (!isEmail.validate(req.body.contact_email, { tld: true })) {
-    return res.status(400).json({
-      message: "Please provide a valid email address in the request",
-    });
-  }
-  if (!phone(req.body.contact_phone).isValid) {
-    return res.status(400).json({
-      message: "Please provide a valid phone number in the request",
-    });
+  const { result, message } = validateRequest(req.body);
+
+  if (!result) {
+    return res.status(400).json({ message: message });
   }
 
   try {
@@ -90,26 +84,28 @@ const addWarehouse = async (req, res) => {
   }
 };
 
-
 const getInventoriesByWarehouseId = async (req, res) => {
   const warehouseId = req.params.id;
 
-  try{
-    const warehouse = await knex("warehouses").where({id: warehouseId}).first();
+  try {
+    const warehouse = await knex("warehouses")
+      .where({ id: warehouseId })
+      .first();
 
-    if(!warehouse){
-      return res.status(404).json({message: `Warehouse with ID ${warehouseId} not found`});
+    if (!warehouse) {
+      return res
+        .status(404)
+        .json({ message: `Warehouse with ID ${warehouseId} not found` });
     }
     const inventories = await knex("inventories")
       .select("id", "item_name", "category", "status", "quantity")
-      .where({warehouse_id: warehouseId});
+      .where({ warehouse_id: warehouseId });
 
     res.status(200).json(inventories);
-  } catch (error){
+  } catch (error) {
     console.log("Error fetching inventories:", error);
-    res.status(500).json({message: `An error occurred: ${error.message}`});
+    res.status(500).json({ message: `An error occurred: ${error.message}` });
   }
-
 };
 
 const deleteWarehouse = async (req, res) => {
@@ -132,4 +128,12 @@ const deleteWarehouse = async (req, res) => {
   }
 };
 
-export { getWarehousesList, getWarehouseById, updateWarehouse, addWarehouse, getInventoriesByWarehouseId, deleteWarehouse };
+export {
+  getWarehousesList,
+  getWarehouseById,
+  updateWarehouse,
+  addWarehouse,
+  getInventoriesByWarehouseId,
+  deleteWarehouse,
+};
+
