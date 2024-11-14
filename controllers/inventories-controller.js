@@ -96,7 +96,7 @@ const updateInventoryItem = async (req, res) => {
   }
 };
 
-const deleteInventory = async (req, res) => {
+const deleteInventoryItem = async (req, res) => {
   const inventoryId = req.params.id;
 
   try {
@@ -152,6 +152,6 @@ export {
   getInventoriesList,
   addInventoryItem,
   updateInventoryItem,
-  deleteInventory,
+  deleteInventoryItem,
   getInventoryItemById,
 };
