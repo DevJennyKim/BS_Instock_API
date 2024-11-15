@@ -12,6 +12,9 @@ const getWarehousesList = async (req, res) => {
         'id',
         'warehouse_name',
         'address',
+        'city',
+        'country',
+        'contact_position',
         'contact_name',
         'contact_phone',
         'contact_email'
