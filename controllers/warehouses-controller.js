@@ -1,12 +1,19 @@
 import initKnex from "knex";
 import configuration from "../knexfile.js";
+import { sortList } from "../utils/sortList.js";
 import { validateRequest } from "../utils/validateRequest.js";
 
 const knex = initKnex(configuration);
 
-const getWarehousesList = async (_req, res) => {
+const getWarehousesList = async (req, res) => {
   try {
     const data = await knex("warehouses");
+
+    const { sort_by, order_by } = req.query;
+    if (sort_by && order_by) {
+      return res.status(200).json(sortList(data, sort_by, order_by));
+    }
+
     res.status(200).json(data);
   } catch (error) {
     res.status(400).json({ message: `Error retrieving warehouses: ${error}` });

@@ -18,11 +18,8 @@ const getInventoriesList = async (req, res) => {
         "inventories.quantity"
       );
 
-    console.log(req.query);
     const { sort_by, order_by } = req.query;
     if (sort_by && order_by) {
-      console.log("in function");
-      console.log(sortList(data, sort_by, order_by));
       return res.status(200).json(sortList(data, sort_by, order_by));
     }
 
