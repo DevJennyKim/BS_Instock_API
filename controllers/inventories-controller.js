@@ -1,20 +1,20 @@
-import initKnex from "knex";
-import configuration from "../knexfile.js";
-import { validateRequest } from "../utils/validateRequest.js";
+import initKnex from 'knex';
+import configuration from '../knexfile.js';
+import { validateRequest } from '../utils/validateRequest.js';
 const knex = initKnex(configuration);
 
 const getInventoriesList = async (_req, res) => {
   try {
-    const data = await knex("inventories")
-      .join("warehouses", "warehouses.id", "inventories.warehouse_id")
+    const data = await knex('inventories')
+      .join('warehouses', 'warehouses.id', 'inventories.warehouse_id')
       .select(
-        "inventories.id",
-        "warehouses.warehouse_name",
-        "inventories.item_name",
-        "inventories.description",
-        "inventories.category",
-        "inventories.status",
-        "inventories.quantity"
+        'inventories.id',
+        'warehouses.warehouse_name',
+        'inventories.item_name',
+        'inventories.description',
+        'inventories.category',
+        'inventories.status',
+        'inventories.quantity'
       );
     res.status(200).json(data);
   } catch (error) {
@@ -30,18 +30,18 @@ const addInventoryItem = async (req, res) => {
   }
 
   try {
-    const warehouseExists = await knex("warehouses")
+    const warehouseExists = await knex('warehouses')
       .where({ id: req.body.warehouse_id })
       .first();
     if (!warehouseExists) {
-      return res.status(400).json({ message: "Warehouse ID does not exist" });
+      return res.status(400).json({ message: 'Warehouse ID does not exist' });
     }
 
-    const dbResult = await knex("inventories").insert(req.body);
+    const dbResult = await knex('inventories').insert(req.body);
 
     const newInventoryItemId = dbResult[0];
 
-    const createdInventoryItem = await knex("inventories")
+    const createdInventoryItem = await knex('inventories')
       .where({ id: newInventoryItemId })
       .first();
 
@@ -63,18 +63,18 @@ const updateInventoryItem = async (req, res) => {
   try {
     const { id, ...updateData } = req.body;
 
-    const warehouseExists = await knex("warehouses")
+    const warehouseExists = await knex('warehouses')
       .where({ id: updateData.warehouse_id })
       .first();
     if (!warehouseExists) {
-      return res.status(400).json({ message: "Warehouse ID does not exist" });
+      return res.status(400).json({ message: 'Warehouse ID does not exist' });
     }
     if (isNaN(updateData.quantity)) {
-      return res.status(400).json({ message: "Quantity must be a number" });
+      return res.status(400).json({ message: 'Quantity must be a number' });
     }
     updateData.updated_at = new Date();
 
-    const rowsUpdated = await knex("inventories")
+    const rowsUpdated = await knex('inventories')
       .where({ id: req.params.id })
       .update(updateData);
 
@@ -83,7 +83,7 @@ const updateInventoryItem = async (req, res) => {
         message: `Inventory item with ID ${req.params.id} not found`,
       });
     }
-    const updatedInventory = await knex("inventories")
+    const updatedInventory = await knex('inventories')
       .where({
         id: req.params.id,
       })
@@ -100,7 +100,7 @@ const deleteInventoryItem = async (req, res) => {
   const inventoryId = req.params.id;
 
   try {
-    const rowsDeleted = await knex("inventories")
+    const rowsDeleted = await knex('inventories')
       .where({ id: inventoryId })
       .delete();
 
@@ -112,7 +112,7 @@ const deleteInventoryItem = async (req, res) => {
 
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting inventory item:", error);
+    console.error('Error deleting inventory item:', error);
     res.status(500).json({ message: `An error occurred: ${error.message}` });
   }
 };
@@ -121,18 +121,19 @@ const getInventoryItemById = async (req, res) => {
   const inventoryId = req.params.id;
 
   try {
-    const inventoryItem = await knex("inventories")
+    const inventoryItem = await knex('inventories')
       .select(
-        "inventories.id",
-        "warehouses.warehouse_name",
-        "inventories.item_name",
-        "inventories.description",
-        "inventories.category",
-        "inventories.status",
-        "inventories.quantity"
+        'inventories.id',
+        'warehouses.warehouse_name',
+        'inventories.warehouse_id',
+        'inventories.item_name',
+        'inventories.description',
+        'inventories.category',
+        'inventories.status',
+        'inventories.quantity'
       )
-      .join("warehouses", "inventories.warehouse_id", "warehouses.id")
-      .where("inventories.id", inventoryId)
+      .join('warehouses', 'inventories.warehouse_id', 'warehouses.id')
+      .where('inventories.id', inventoryId)
       .first();
 
     if (!inventoryItem) {
@@ -143,7 +144,7 @@ const getInventoryItemById = async (req, res) => {
 
     res.status(200).json(inventoryItem);
   } catch (error) {
-    console.error("Error retrieving inventory item:", error);
+    console.error('Error retrieving inventory item:', error);
     res.status(500).json({ message: `An error occurred: ${error.message}` });
   }
 };
