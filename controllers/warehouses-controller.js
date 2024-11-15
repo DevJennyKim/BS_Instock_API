@@ -1,12 +1,26 @@
-import initKnex from "knex";
-import configuration from "../knexfile.js";
-import { validateRequest } from "../utils/validateRequest.js";
+import initKnex from 'knex';
+import configuration from '../knexfile.js';
+import { validateRequest } from '../utils/validateRequest.js';
 
 const knex = initKnex(configuration);
 
-const getWarehousesList = async (_req, res) => {
+const getWarehousesList = async (req, res) => {
+  const searchTerm = req.query.s || '';
   try {
-    const data = await knex("warehouses");
+    const data = await knex('warehouses')
+      .select(
+        'id',
+        'warehouse_name',
+        'address',
+        'contact_name',
+        'contact_phone',
+        'contact_email'
+      )
+      .where('warehouse_name', 'like', `%${searchTerm}%`)
+      .orWhere('address', 'like', `%${searchTerm}%`)
+      .orWhere('contact_name', 'like', `%${searchTerm}%`)
+      .orWhere('contact_phone', 'like', `%${searchTerm}%`)
+      .orWhere('contact_email', 'like', `%${searchTerm}%`);
     res.status(200).json(data);
   } catch (error) {
     res.status(400).json({ message: `Error retrieving warehouses: ${error}` });
@@ -15,7 +29,7 @@ const getWarehousesList = async (_req, res) => {
 
 const getWarehouseById = async (req, res) => {
   try {
-    const warehouse = await knex("warehouses")
+    const warehouse = await knex('warehouses')
       .where({ id: req.params.id })
       .first();
     if (!warehouse) {
@@ -43,7 +57,7 @@ const updateWarehouse = async (req, res) => {
 
     updateData.updated_at = new Date();
 
-    const rowsUpdated = await knex("warehouses")
+    const rowsUpdated = await knex('warehouses')
       .where({ id: req.params.id })
       .update(updateData);
 
@@ -52,7 +66,7 @@ const updateWarehouse = async (req, res) => {
         message: `Warehouse with ID ${req.params.id} not found`,
       });
     }
-    const updatedWarehouse = await knex("warehouses").where({
+    const updatedWarehouse = await knex('warehouses').where({
       id: req.params.id,
     });
     res.json(updatedWarehouse[0]);
@@ -71,10 +85,10 @@ const addWarehouse = async (req, res) => {
   }
 
   try {
-    const result = await knex("warehouses").insert(req.body);
+    const result = await knex('warehouses').insert(req.body);
 
     const newWarehouseId = result[0];
-    const createdWarehouse = await knex("warehouses").where({
+    const createdWarehouse = await knex('warehouses').where({
       id: newWarehouseId,
     });
 
@@ -90,7 +104,7 @@ const getInventoryByWarehouseId = async (req, res) => {
   const warehouseId = req.params.id;
 
   try {
-    const warehouse = await knex("warehouses")
+    const warehouse = await knex('warehouses')
       .where({ id: warehouseId })
       .first();
 
@@ -99,13 +113,13 @@ const getInventoryByWarehouseId = async (req, res) => {
         .status(404)
         .json({ message: `Warehouse with ID ${warehouseId} not found` });
     }
-    const inventories = await knex("inventories")
-      .select("id", "item_name", "category", "status", "quantity")
+    const inventories = await knex('inventories')
+      .select('id', 'item_name', 'category', 'status', 'quantity')
       .where({ warehouse_id: warehouseId });
 
     res.status(200).json(inventories);
   } catch (error) {
-    console.log("Error fetching inventories:", error);
+    console.log('Error fetching inventories:', error);
     res.status(500).json({ message: `An error occurred: ${error.message}` });
   }
 };
@@ -113,7 +127,7 @@ const getInventoryByWarehouseId = async (req, res) => {
 const deleteWarehouse = async (req, res) => {
   const warehouseId = req.params.id;
   try {
-    const rowsDeleted = await knex("warehouses")
+    const rowsDeleted = await knex('warehouses')
       .where({ id: warehouseId })
       .delete();
 
@@ -123,12 +137,12 @@ const deleteWarehouse = async (req, res) => {
         .json({ message: `Warehouse with ID ${warehouseId} not found` });
     }
 
-    await knex("inventories").where({ warehouse_id: warehouseId }).del();
-    await knex("warehouses").where({ id: warehouseId }).del();
+    await knex('inventories').where({ warehouse_id: warehouseId }).del();
+    await knex('warehouses').where({ id: warehouseId }).del();
 
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting warehouse:", error);
+    console.error('Error deleting warehouse:', error);
     res.status(500).json({ message: `An error occurred: ${error.message}` });
   }
 };

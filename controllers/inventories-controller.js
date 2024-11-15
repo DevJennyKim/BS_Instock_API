@@ -4,7 +4,7 @@ import { validateRequest } from '../utils/validateRequest.js';
 const knex = initKnex(configuration);
 
 const getInventoriesList = async (req, res) => {
-  const searchKeyword = req.query.s || '';
+  const searchTerm = req.query.s || '';
   try {
     const data = await knex('inventories')
       .join('warehouses', 'warehouses.id', 'inventories.warehouse_id')
@@ -17,10 +17,10 @@ const getInventoriesList = async (req, res) => {
         'inventories.status',
         'inventories.quantity'
       )
-      .where('inventories.item_name', 'like', `%${searchKeyword}%`)
-      .orWhere('inventories.category', 'like', `%${searchKeyword}%`)
-      .orWhere('warehouses.warehouse_name', 'like', `%${searchKeyword}%`)
-      .orWhere('inventories.description', 'like', `%${searchKeyword}%`);
+      .where('inventories.item_name', 'like', `%${searchTerm}%`)
+      .orWhere('inventories.category', 'like', `%${searchTerm}%`)
+      .orWhere('warehouses.warehouse_name', 'like', `%${searchTerm}%`)
+      .orWhere('inventories.description', 'like', `%${searchTerm}%`);
     res.status(200).json(data);
   } catch (error) {
     res.status(400).json({ message: `Error retrieving inventories: ${error}` });
