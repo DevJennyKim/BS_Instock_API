@@ -6,10 +6,28 @@ import { validateRequest } from "../utils/validateRequest.js";
 const knex = initKnex(configuration);
 
 const getWarehousesList = async (req, res) => {
-  try {
-    const data = await knex("warehouses");
+  const searchTerm = req.query.s || "";
+  const { sort_by, order_by } = req.query;
 
-    const { sort_by, order_by } = req.query;
+  try {
+    const data = await knex("warehouses")
+      .select(
+        "id",
+        "warehouse_name",
+        "address",
+        "city",
+        "country",
+        "contact_position",
+        "contact_name",
+        "contact_phone",
+        "contact_email"
+      )
+      .where("warehouse_name", "like", `%${searchTerm}%`)
+      .orWhere("address", "like", `%${searchTerm}%`)
+      .orWhere("contact_name", "like", `%${searchTerm}%`)
+      .orWhere("contact_phone", "like", `%${searchTerm}%`)
+      .orWhere("contact_email", "like", `%${searchTerm}%`);
+
     if (sort_by && order_by) {
       return res.status(200).json(sortList(data, sort_by, order_by));
     }
