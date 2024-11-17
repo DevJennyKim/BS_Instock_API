@@ -9,7 +9,8 @@ Welcome to the Instock project, developed by the Flying Falcons team!
 - Wendi Huang
 
 ## Installation:
-npm i:
+**To install the dependencies, run the following command:**
+npm install 
 - cors version ^2.8.5
 - dotenv version ^16.4.5
 - express version ^4.21.1
