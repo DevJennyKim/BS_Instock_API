@@ -2,6 +2,8 @@
 
 Welcome to the Instock project, developed by the Flying Falcons team!
 
+Jira: https://brainstationeducation.atlassian.net/jira/software/c/projects/FFCTC/boards/895
+
 ## Team Members:
 - Emily Schur
 - Jenny Kim
