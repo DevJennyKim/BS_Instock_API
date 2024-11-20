@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-export function up(knex) {
+export async function up(knex) {
   return knex.schema.createTable('inventories', (table) => {
     table.increments('id').primary();
     table
